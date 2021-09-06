@@ -1,3 +1,8 @@
+const name = 'fred';
+const car = {
+  make: 'Ford',
+};
+
 // 1 - pull in the HTTP server module
 const http = require('http');
 
@@ -39,51 +44,44 @@ const errorPage = `
 // 6 - this will return a random number no bigger than `max`, as a string
 // we will also doing our query parameter validation here
 const getRandomNumberJSON = (max = 1) => {
-    max= Number(max);
-    max = !max ? 1 : max;
-    max = max < 1 ? 1 : max;
+  let maxNum = Number(max);
+  maxNum = !maxNum ? 1 : maxNum;
+  maxNum = maxNum < 1 ? 1 : maxNum;
 
-    const number = Math.random() * max;
+  const number = Math.random() * maxNum;
 
-    const responseObj = {
-      timestamp: new Date(),
-      number: number
-    }
+  const responseObj = {
+    timestamp: new Date(),
+    number,
+  };
 
-    return JSON.stringify(responseObj);
+  return JSON.stringify(responseObj);
 };
-
 
 // 7 - this is the function that will be called every time a client request comes in
 // this time we will look at the `pathname`, and send back the appropriate page
 // note that in this course we'll be using arrow functions 100% of the time in our server-side code
 const onRequest = (request, response) => {
-    const parsedUrl = url.parse(request.url);
-    const pathname = parsedUrl.pathname;
+  const parsedUrl = url.parse(request.url);
+  const { pathname } = parsedUrl;
 
-    const params = query.parse(parsedUrl.query);
-    const max = params.max;
+  const params = query.parse(parsedUrl.query);
+  const { max } = params;
 
-    if(pathname == "/")
-    {
-        response.writeHead(200, { 'Content-Type': 'text/html'});
-        response.write(indexPage);
-        response.end();
-    }
-    else if (pathname == "/random-number")
-    {
-        response.writeHead(200, { 'Content-Type': 'text/plain'});
-        response.write(getRandomNumberJSON(max));
-        response.end();
-    }
-    else
-    {
-        response.writeHead(404, { 'Content-Type': 'text/html'});
-        response.write(errorPage);
-        response.end();
-    }
+  if (pathname === '/') {
+    response.writeHead(200, { 'Content-Type': 'text/html' });
+    response.write(indexPage);
+    response.end();
+  } else if (pathname === '/random-number') {
+    response.writeHead(200, { 'Content-Type': 'text/plain' });
+    response.write(getRandomNumberJSON(max));
+    response.end();
+  } else {
+    response.writeHead(404, { 'Content-Type': 'text/html' });
+    response.write(errorPage);
+    response.end();
+  }
 };
-
 
 // 8 - create the server, hook up the request handling function, and start listening on `port`
 http.createServer(onRequest).listen(port);
