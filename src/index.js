@@ -1,5 +1,3 @@
-console.log("First web service starting up ...");
-
 // 1 - pull in the HTTP server module
 const http = require('http');
 
@@ -60,18 +58,12 @@ const getRandomNumberJSON = (max = 1) => {
 // this time we will look at the `pathname`, and send back the appropriate page
 // note that in this course we'll be using arrow functions 100% of the time in our server-side code
 const onRequest = (request, response) => {
-    console.log(request.headers);
     const parsedUrl = url.parse(request.url);
     const pathname = parsedUrl.pathname;
 
     const params = query.parse(parsedUrl.query);
     const max = params.max;
 
-    console.log("params=", params);
-    console.log("max=", max);
-    console.log("parsedUrl=", parsedUrl);
-    console.log("pathname=", pathname);
-   
     if(pathname == "/")
     {
         response.writeHead(200, { 'Content-Type': 'text/html'});

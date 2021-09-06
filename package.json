@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "start": "node ./src/index.js"
+    "start": "node ./src/index.js",
+    "nodemon": "nodemon ./src/index.js -e js,html,css"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +18,8 @@
     "url": "https://github.com/Long-T-Hoang/first-web-service-heroku/issues"
   },
   "homepage": "https://github.com/Long-T-Hoang/first-web-service-heroku#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  }
 }
