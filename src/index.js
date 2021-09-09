@@ -10,53 +10,19 @@ const http = require('http');
 const url = require('url');
 const query = require('querystring');
 
+// handlers
+const jsonHandler = require('./jsonResponses');
+const htmlHandler = require('./htmlResponses');
+
+// dispatch table
+const urlStruct = {
+  '/': htmlHandler.getIndexResponse,
+  '/random-number': jsonHandler.getRandomNumberResponse,
+  notFound: htmlHandler.get404Response,
+};
+
 // 3 - locally this will be 3000, on Heroku it will be assigned
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
-
-// 4 - here's our index page
-const indexPage = `
-<html>
-  <head>
-    <title>Random Number Web Service</title>
-  </head>
-  <body>
-    <h1>Random Number Web Service</h1>
-    <p>
-      Random Number Web Service - the endpoint is here --> 
-      <a href="/random-number">random-number</a> or <a href="/random-number?max=10">random-number?max=10</a>
-    </p>
-  </body>
-</html>`;
-
-// 5 - here's our 404 page
-const errorPage = `
-<html>
-    <head>
-        <title>404 - File Not Found!</title>
-    </head>
-    <body>
-        <h1>404 - File Not Found!</h1>
-        <p>Check your URL, or your typing!!</p>
-        <p>:-O</p>
-    </body>
-</html>`;
-
-// 6 - this will return a random number no bigger than `max`, as a string
-// we will also doing our query parameter validation here
-const getRandomNumberJSON = (max = 1) => {
-  let maxNum = Number(max);
-  maxNum = !maxNum ? 1 : maxNum;
-  maxNum = maxNum < 1 ? 1 : maxNum;
-
-  const number = Math.random() * maxNum;
-
-  const responseObj = {
-    timestamp: new Date(),
-    number,
-  };
-
-  return JSON.stringify(responseObj);
-};
 
 // 7 - this is the function that will be called every time a client request comes in
 // this time we will look at the `pathname`, and send back the appropriate page
@@ -68,18 +34,10 @@ const onRequest = (request, response) => {
   const params = query.parse(parsedUrl.query);
   const { max } = params;
 
-  if (pathname === '/') {
-    response.writeHead(200, { 'Content-Type': 'text/html' });
-    response.write(indexPage);
-    response.end();
-  } else if (pathname === '/random-number') {
-    response.writeHead(200, { 'Content-Type': 'text/plain' });
-    response.write(getRandomNumberJSON(max));
-    response.end();
+  if (urlStruct[pathname]) {
+    urlStruct[pathname](request, response, params);
   } else {
-    response.writeHead(404, { 'Content-Type': 'text/html' });
-    response.write(errorPage);
-    response.end();
+    urlStruct.notFound(request, response, params);
   }
 };
 
